@@ -15,9 +15,9 @@ class Baza(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     view = models.IntegerField(default=0)
 
-    # def update_test_count(self):
-    #     self.test_count = self.test_set.count()
-    #     self.save()
+    def update_test_count(self):
+        self.test_count = self.test_set.count()
+        self.save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

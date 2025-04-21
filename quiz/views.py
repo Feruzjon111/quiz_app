@@ -10,11 +10,13 @@ def test_create(request):
         if form.is_valid():
             test = form.save(commit=False)
             test.created_by = request.user
-            return redirect('test_list')  
+            test.save()  # <-- Bu juda muhim! Shunda test saqlanadi
+            return redirect('test_list', baza_id=test.baza.id)
     else:
         form = TestForm()
 
     return render(request, 'test_create.html', {'form': form})
+
 
 
 def index(request):
@@ -44,7 +46,6 @@ def baza_list(request, category_id):
 def test_list(request, baza_id):
     baza = get_object_or_404(Baza, id=baza_id)
 
-    # View ni oshiramiz
     baza.view += 1
     baza.save()
 
