@@ -6,6 +6,9 @@ class Category(models.Model):
     name = models.CharField(max_length=200)
     count = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
 
 class Baza(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -14,6 +17,9 @@ class Baza(models.Model):
     name = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     view = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
 
     def update_test_count(self):
         self.test_count = self.test_set.count()
@@ -33,6 +39,9 @@ class Test(models.Model):
     c = models.CharField(max_length=200)
     d = models.CharField(max_length=200, null=True, blank=True)
     togri = models.CharField(max_length=1, help_text='Masalan: a')
+
+    def __str__(self):
+        return self.savol
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
