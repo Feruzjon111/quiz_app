@@ -1,10 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib import messages
-from .models import Test
 from django.contrib.auth.decorators import login_required
 from .forms import TestForm
+from .models import Test
 
 @login_required
 def test_create(request):
@@ -23,34 +20,33 @@ def test_create(request):
 def index(request):
     return render(request, 'index.html')
 
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('index')
-        else:
-            messages.error(request, 'Login or password is incorrect.')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+# def test_list(request):
+#     tests = Test.objects.all()
+#     return render(request, 'tests.html', {'tests': tests})
 
-def register_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Account created! Now you can log in.')
-            return redirect('login')
-    else:
-        form = UserCreationForm()
-    return render(request, 'register.html', {'form': form})
+from django.shortcuts import render, get_object_or_404
+from .models import Category, Baza, Test
 
-def logout_view(request):
-    logout(request)
-    return redirect('index')
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'quiz/category.html', {'categories': categories})
 
-def test_list(request):
-    tests = Test.objects.all()
-    return render(request, 'tests.html', {'tests': tests})
+
+def baza_list(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    bazas = Baza.objects.filter(category=category)
+    return render(request, 'quiz/baza.html', {
+        'category': category,
+        'bazas': bazas
+    })
+
+
+def test_list(request, baza_id):
+    baza = get_object_or_404(Baza, id=baza_id)
+
+    # View ni oshiramiz
+    baza.view += 1
+    baza.save()
+
+    tests = Test.objects.filter(baza=baza)
+    return render(request, 'quiz/test.html', {'baza': baza, 'tests': tests})

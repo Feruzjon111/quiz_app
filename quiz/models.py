@@ -1,39 +1,40 @@
-from datetime import timedelta
-
-from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django.db import models
+
 
 class Category(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=200)
+    count = models.IntegerField(default=0)
 
-    def __str__(self):
-        return self.name
 
-def default_end_date():
-    return timezone.now() + timedelta(days=10)
-
-class Test(models.Model):
+class Baza(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    title = models.CharField(max_length=150)
-    maximum_attempts = models.PositiveIntegerField()
-    start_date = models.DateTimeField(default=timezone.now)
-    end_date = models.DateTimeField(default=default_end_date)
-    pass_percentage = models.PositiveIntegerField()
+    test_count = models.IntegerField(default=0)
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+    view = models.IntegerField(default=0)
 
-    def __str__(self):
-        return self.title
+    # def update_test_count(self):
+    #     self.test_count = self.test_set.count()
+    #     self.save()
 
-class Question(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    question = models.CharField(max_length=300)
-    a = models.CharField(max_length=150)
-    b = models.CharField(max_length=150)
-    c = models.CharField(max_length=150)
-    d = models.CharField(max_length=150)
-    true_answer = models.CharField(max_length=150, help_text='E.x: a')
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.category.count = self.category.baza_set.count()
+        self.category.save()
 
-    def __str__(self):
-        return self.question
+
+class Test(models.Model):
+    baza = models.ForeignKey(Baza, on_delete=models.CASCADE)
+    savol = models.TextField()
+    a = models.CharField(max_length=200)
+    b = models.CharField(max_length=200)
+    c = models.CharField(max_length=200)
+    d = models.CharField(max_length=200, null=True, blank=True)
+    togri = models.CharField(max_length=1, help_text='Masalan: a')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.baza.update_test_count()
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ baza.name }} - Testlar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .result {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        .answer-option {
+            cursor: pointer;
+        }
+        .answer-option.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="container my-5">
+    <h2>Testlar: {{ baza.name }}</h2>
+    <a href="{% url 'baza_list' baza.category.id %}" class="btn btn-secondary mb-3">⬅ Orqaga</a>
+    <form id="testForm">
+        {% for test in tests %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <strong>{{ forloop.counter }}. {{ test.savol }}</strong><br>
+                    <div>
+                        <label class="answer-option">
+                            <input type="radio" name="test_{{ test.id }}" value="a" class="form-check-input" onclick="checkAnswer(this, '{{ test.id }}', '{{ test.togri|lower }}')" />
+                            A) {{ test.a }}
+                        </label><br>
+                        <label class="answer-option">
+                            <input type="radio" name="test_{{ test.id }}" value="b" class="form-check-input" onclick="checkAnswer(this, '{{ test.id }}', '{{ test.togri|lower }}')" />
+                            B) {{ test.b }}
+                        </label><br>
+                        <label class="answer-option">
+                            <input type="radio" name="test_{{ test.id }}" value="c" class="form-check-input" onclick="checkAnswer(this, '{{ test.id }}', '{{ test.togri|lower }}')" />
+                            C) {{ test.c }}
+                        </label><br>
+                        {% if test.d %}
+                            <label class="answer-option">
+                                <input type="radio" name="test_{{ test.id }}" value="d" class="form-check-input" onclick="checkAnswer(this, '{{ test.id }}', '{{ test.togri|lower }}')" />
+                                D) {{ test.d }}
+                            </label><br>
+                        {% endif %}
+                    </div>
+                    <small class="text-success d-none correct-answer">To'g'ri javob: {{ test.togri|upper }}</small>
+                </div>
+            </div>
+        {% empty %}
+            <p>Hozircha test yo'q.</p>
+        {% endfor %}
+    </form>
+
+    <div class="result d-none" id="result"></div>
+
+    <!-- Qayta ishlash va Chiqish tugmalari (initially hidden) -->
+    <div class="mt-3" id="finishButtons" style="display:none;">
+        <button class="btn btn-primary" onclick="reloadPage()">Qayta ishlash</button>
+        <a href="{% url 'baza_list' baza.category.id %}" class="btn btn-danger">Chiqish</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let correctAnswers = 0;
+        let totalQuestions = {{ tests|length }};
+        let answeredQuestions = 0;
+
+        function checkAnswer(selectedOption, testId, correctAnswer) {
+            // Agar foydalanuvchi to'g'ri javobni tanlasa
+            let testCard = selectedOption.closest('.card-body');
+            let correctAnswerText = testCard.querySelector('.correct-answer');
+
+            // Barcha variantlarni bloklash
+            let allOptions = testCard.querySelectorAll('.answer-option input');
+            allOptions.forEach(option => option.disabled = true);
+
+            // To'g'ri yoki xato javobni belgilash
+            if (selectedOption.value === correctAnswer) {
+                testCard.classList.add('correct');
+                correctAnswers++;  // To'g'ri javoblarni hisoblash
+            } else {
+                testCard.classList.add('incorrect');
+            }
+
+            // To'g'ri javobni ko'rsatish
+            correctAnswerText.classList.remove('d-none');
+
+            // Foydalanuvchi javob berganini hisoblash
+            answeredQuestions++;
+
+            // Test tugallanganligini tekshirish
+            if (answeredQuestions === totalQuestions) {
+                showResult();
+                document.getElementById('finishButtons').style.display = 'block';  // Tugmalarni ko'rsatish
+            }
+        }
+
+        function showResult() {
+            let percentage = (correctAnswers / totalQuestions) * 100;
+            let resultText = `Siz ${correctAnswers} ta to'g'ri javob berdingiz (${percentage.toFixed(2)}%)`;
+
+            // Natijani ko'rsatish
+            document.getElementById('result').innerHTML = resultText;
+            document.getElementById('result').classList.remove('d-none');
+        }
+
+        // Sahifani qayta yuklash funksiyasi
+        function reloadPage() {
+            location.reload();  // Sahifani qayta yuklash
+        }
+    </script>
+</body>
+</html>
