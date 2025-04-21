@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Foydalanuvchi Profili</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .profile-card {
+            background: #1f2d3d;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .avatar {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #00bcd4;
+        }
+        .btn-edit {
+            background: #00bcd4;
+            border: none;
+        }
+        .btn-edit:hover {
+            background: #0097a7;
+        }
+        .info-item {
+            margin-bottom: 15px;
+        }
+        .info-item span {
+            color: #bbb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+
+                <div class="profile-card text-center">
+                    <!-- Avatar -->
+                    {% if user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="Avatar" class="avatar mb-3">
+                    {% else %}
+                        <img src="https://via.placeholder.com/130x130.png?text=User" alt="Avatar" class="avatar mb-3">
+                    {% endif %}
+
+                    <!-- Name -->
+                    <h3>{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted">@{{ user.username }}</p>
+
+                    <!-- Info -->
+                    <div class="mt-4 text-start px-3">
+                        <div class="info-item"><strong>Email:</strong> <span>{{ user.email }}</span></div>
+                        {% if user.userprofile.birth_date %}
+                            <div class="info-item"><strong>Tug‘ilgan sana:</strong> <span>{{ user.userprofile.birth_date }}</span></div>
+                        {% endif %}
+                        {% if user.userprofile.location %}
+                            <div class="info-item"><strong>Manzil:</strong> <span>{{ user.userprofile.location }}</span></div>
+                        {% endif %}
+                        {% if user.userprofile.bio %}
+                            <div class="info-item"><strong>Bio:</strong> <span>{{ user.userprofile.bio }}</span></div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Edit button -->
+                    <div class="mt-4">
+                        <a href="{% url 'profile_edit' %}" class="btn btn-edit px-4 py-2 text-white">Profilni tahrirlash</a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

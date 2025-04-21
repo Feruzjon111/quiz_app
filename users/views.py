@@ -33,4 +33,41 @@ def logout_view(request):
     return redirect('index')
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import UserProfileForm
+
+@login_required
+def profile_view(request):
+    return render(request, 'profile.html')
+
+# users/views.py
+from django.shortcuts import render, redirect
+from .models import UserProfile
+from .forms import UserProfileForm
+
+def profile_edit(request):
+    # Foydalanuvchining profilini olishga harakat qilamiz
+    try:
+        profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        # Agar profil mavjud bo'lmasa, yangi profil yaratish
+        profile = UserProfile(user=request.user)
+        profile.save()
+
+    # Profilni tahrir qilish
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Profilni ko'rish sahifasiga qaytish
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, 'profile_edit.html', {'form': form})
+
+
+
+
+
 
